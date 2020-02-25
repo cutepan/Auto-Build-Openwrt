@@ -23,7 +23,7 @@ env:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
 
     steps:
     - name: Checkout
@@ -71,19 +71,6 @@ jobs:
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
-    - name: Upload dl
-      id: upload_dl
-      env:
-        GITHUB_TOKEN: ${{ secrets.Actions_OpenWrt}}
-      run: |
-        cd openwrt/dl
-        git init
-        git config user.name "bot"
-        git config user.email "bot@github.com"
-        git add .
-        git commit -m "$PROFILE$(TZ='Asia/Shanghai' date +@%Y%m%d)"
-        git push --force --quiet "https://$GITHUB_TOKEN@github.com/hyird/Actions-OpenWrt.git" HEAD:dl
-        
         
     - name: Compile the firmware
       id: compile

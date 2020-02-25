@@ -1,4 +1,4 @@
-name: Build OpenWrt X64
+name: Build OpenWrt MT7621
 
 on:
   release:
@@ -16,7 +16,7 @@ on:
 env:
   REPO_URL: https://github.com/coolsnowwolf/lede
   REPO_BRANCH: master
-  CONFIG_FILE: config/x64.config
+  CONFIG_FILE: config/mt7621.config
   DIY_SH: diy.sh
   TZ: Asia/Shanghai
 
@@ -75,15 +75,6 @@ jobs:
         find dl -size -1024c -exec rm -f {} \;
         tar czvf dl.tar.gz dl
         rm -rf dl
-     
-    - name: Upload dl Release Asset
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.TOKEN }}
-        file: openwrt/dl.tar.gz
-        tag: ${{ env.DATE }}
-        overwrite: true
-        file_glob: true
         
     - name: Compile the firmware
       id: compile
@@ -93,8 +84,8 @@ jobs:
         make -j$(nproc) || make -j1 V=s
         echo "::set-output name=status::success"
         cd bin
-        tar czvf x64_packages.tar.gz packages
-        tar czvf x64_targets.tar.gz  targets
+        tar czvf mt7621_packages.tar.gz packages
+        tar czvf mt7621_targets.tar.gz  targets
         
     - name: Upload packages directory
       uses: actions/upload-artifact@master
@@ -112,7 +103,7 @@ jobs:
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.TOKEN }}
-        file: openwrt/bin/x64_packages.tar.gz
+        file: openwrt/bin/mt7621_packages.tar.gz
         tag: ${{ env.DATE }}
         overwrite: true
         file_glob: true
@@ -121,7 +112,7 @@ jobs:
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.TOKEN }}
-        file: openwrt/bin/x64_targets.tar.gz
+        file: openwrt/bin/mt7621_targets.tar.gz
         tag: ${{ env.DATE }}
         overwrite: true
         file_glob: true

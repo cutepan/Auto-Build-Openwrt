@@ -1,0 +1,122 @@
+name: Build Openwrt X64
+
+on:
+  release:
+    types: [published]
+  push:
+    branches:
+      - master
+    paths:
+      - 'start'
+    schedule:
+      - cron: "0 4 * * *"
+#  watch:
+#    types: [started]
+
+env:
+  REPO_URL: https://github.com/coolsnowwolf/lede
+  REPO_BRANCH: master
+  CONFIG_FILE: config/x64.config
+  DIY_SH: diy.sh
+  FREE_UP_DISK: true
+  TZ: Asia/Shanghai
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+      
+    - name: Set Date
+      run: |
+         date=$(date +%Y-%m-%d)
+         echo "::set-env name=DATE::$date"
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo swapoff /swapfile
+        sudo rm -rf /swapfile /etc/apt/sources.list.d/*
+        sudo -E apt-get -qq update
+        sudo -E apt-get -qq install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler g++-multilib linux-libc-dev:i386
+        curl -fsSL https://raw.githubusercontent.com/P3TERX/dotfiles/master/.bashrc >> ~/.bashrc
+
+    - name: Clone source code
+      run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
+      
+    - name: Add Lienol packages
+      run: cd openwrt && echo "src-git lienol https://github.com/Lienol/openwrt-package" >> feeds.conf.default && cat feeds.conf.default
+      
+
+    - name: Update feeds
+      run: cd openwrt && ./scripts/feeds update -a
+
+    - name: Install feeds
+      run: cd openwrt && ./scripts/feeds install -a
+
+    - name: Load custom configuration
+      run: |
+        [ -e files ] && mv files openwrt/files
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
+        chmod +x $DIY_SH
+        cd openwrt
+        ../$DIY_SH
+        make defconfig
+    - name: Download package
+      id: package
+      run: |
+        cd openwrt
+        make download -j8
+        find dl -size -1024c -exec ls -l {} \;
+        find dl -size -1024c -exec rm -f {} \;
+    - name: Upload dl
+      id: upload_dl
+      env:
+        GITHUB_TOKEN: ${{ secrets.Actions_OpenWrt}}
+      run: |
+        cd openwrt/dl
+        git init
+        git config user.name "bot"
+        git config user.email "bot@github.com"
+        git add .
+        git commit -m "$PROFILE$(TZ='Asia/Shanghai' date +@%Y%m%d)"
+        git push --force --quiet "https://$GITHUB_TOKEN@github.com/hyird/Actions-OpenWrt.git" HEAD:dl
+        
+        
+    - name: Compile the firmware
+      id: compile
+      run: |
+        cd openwrt
+        echo -e "$(nproc) thread compile"
+        make -j$(nproc) || make -j1 V=s
+        echo "::set-output name=status::success"
+
+    - name: Upload Packages
+      id: upload_packages
+      env:
+        GITHUB_TOKEN: ${{ secrets.Actions_OpenWrt}}
+      run: |
+        cd openwrt/bin/packages
+        git init
+        git config user.name "bot"
+        git config user.email "bot@github.com"
+        git add .
+        git commit -m "Packages$(TZ='Asia/Shanghai' date +@%Y%m%d)"
+        git push --force --quiet "https://$GITHUB_TOKEN@github.com/hyird/Actions-OpenWrt.git" HEAD:packages/x64
+
+
+    - name: Upload Targets
+      id: upload_targets
+      env:
+        GITHUB_TOKEN: ${{ secrets.Actions_OpenWrt}}
+      run: |
+        cd openwrt/bin/targets
+        git init
+        git config user.name "bot"
+        git config user.email "bot@github.com"
+        git add .
+        git commit -m "Packages$(TZ='Asia/Shanghai' date +@%Y%m%d)"
+        git push --force --quiet "https://$GITHUB_TOKEN@github.com/hyird/Actions-OpenWrt.git" HEAD:targets/x64
+

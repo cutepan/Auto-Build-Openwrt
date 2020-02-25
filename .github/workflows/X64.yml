@@ -73,14 +73,13 @@ jobs:
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
-        tar czvf dl.tar.gz dl
-        rm -rf dl
+        tar cvf dl.tar dl
      
     - name: Upload dl Release Asset
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.TOKEN }}
-        file: openwrt/dl.tar.gz
+        file: openwrt/dl.tar
         tag: ${{ env.DATE }}
         overwrite: true
         file_glob: true

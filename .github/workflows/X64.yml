@@ -77,7 +77,7 @@ jobs:
     - name: Push dl
       id: psuh_packages
       env:
-        TOKEN: ${{ secrets.Actions_OpenWrt}}
+        TOKEN: ${{ secrets.TOKEN}}
       run: |
         cd openwrt/dl
         rm -rf qt-*
@@ -86,7 +86,7 @@ jobs:
         git config user.email "bot@github.com"
         git add .
         git commit -m "Packages$(TZ='Asia/Shanghai' date +@%Y%m%d)"
-        git push --force --quiet "https://$TOKEN@github.com/hyird/Actions-OpenWrt.git" HEAD:dl
+        git push --force --quiet "https://$TOKEN@github.com/hyird/Auto-Build-Openwrt.git" HEAD:dl
         
     - name: Compile the firmware
       id: compile
@@ -111,7 +111,7 @@ jobs:
     - name: Push Packages
       id: push_packages
       env:
-        TOKEN: ${{ secrets.Actions_OpenWrt}}
+        TOKEN: ${{ secrets.TOKEN}}
       run: |
         cd openwrt/bin/packages
         git init
@@ -119,12 +119,12 @@ jobs:
         git config user.email "bot@github.com"
         git add .
         git commit -m "Packages$(TZ='Asia/Shanghai' date +@%Y%m%d)"
-        git push --force --quiet "https://$TOKEN@github.com/hyird/Actions-OpenWrt.git" HEAD:packages/x64
+        git push --force --quiet "https://$TOKEN@github.com/hyird/Auto-Build-Openwrt.git" HEAD:packages/x64
         
     - name: Push Targets
       id: push_targets
       env:
-        TOKEN: ${{ secrets.Actions_OpenWrt}}
+        TOKEN: ${{ secrets.TOKEN}}
       run: |
         cd openwrt/bin/targets
         git init
@@ -132,4 +132,4 @@ jobs:
         git config user.email "bot@github.com"
         git add .
         git commit -m "Packages$(TZ='Asia/Shanghai' date +@%Y%m%d)"
-        git push --force --quiet "https://$TOKEN@github.com/hyird/Actions-OpenWrt.git" HEAD:targets/x64
+        git push --force --quiet "https://$TOKEN@github.com/hyird/Auto-Build-Openwrt.git" HEAD:targets/x64

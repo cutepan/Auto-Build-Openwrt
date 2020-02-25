@@ -1,6 +1,6 @@
 #change opkg mirros
 sed -i 's/openwrt.proxy.ustclug.org/op.hyird.xyz/g' package/lean/default-settings/files/zzz-default-settings
-sed -i 's/https/R20.2.15/g' package/lean/default-settings/files/zzz-default-settings
+sed -i 's/https/R20.2.25/g' package/lean/default-settings/files/zzz-default-settings
 sed -i 's/http/snapshots/g' package/lean/default-settings/files/zzz-default-settings
 
 #delete default password

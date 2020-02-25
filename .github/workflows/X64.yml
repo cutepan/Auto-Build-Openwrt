@@ -73,7 +73,7 @@ jobs:
         make download -j8
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
-        tar czvf dl.tar.tz dl
+        tar czvf dl.tar.gz dl
      
     - name: Upload dl Release Asset
       uses: svenstaro/upload-release-action@v1-release

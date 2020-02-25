@@ -79,7 +79,7 @@ jobs:
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.TOKEN }}
-        file: dl.tar.tz
+        file: openwrt/dl.tar.tz
         tag: ${{ env.DATE }}
         overwrite: true
         file_glob: true
@@ -111,7 +111,7 @@ jobs:
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.TOKEN }}
-        file: /bin/packages.tar.gz
+        file: openwrt/bin/packages.tar.gz
         tag: ${{ env.DATE }}
         overwrite: true
         file_glob: true
@@ -120,7 +120,7 @@ jobs:
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.TOKEN }}
-        file: /bin/targets.tar.gz
+        file: openwrt/bin/targets.tar.gz
         tag: ${{ env.DATE }}
         overwrite: true
         file_glob: true
